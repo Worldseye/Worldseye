@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Image Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f0f0f0;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #image-box {
+      width: 80%;
+      height: 300px;
+      border: 2px dashed #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      margin: 0 auto; /* This will center the image box horizontally */
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #random-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Click the Button to Get a Random Image</h1>
+  <button onclick="getRandomImage()">Get Random Image</button>
+
+  <div id="image-box">
+    <!-- The image will appear here -->
+  </div>
+
+  <script>
+    const apiKey = 'hRTgmCTDfZeQyteHCUQtZ02RnzFAylnQEuUtISPcmxrWerqTb767Eu4P'; // Your Pexels API key
+    const apiUrl = 'https://api.pexels.com/v1/curated'; // Base URL for the Pexels API
+
+    // Fetch random image from Pexels API
+    function getRandomImage() {
+      console.log("Button clicked, fetching new image...");
+
+      // Clear previous image content in image-box (Important step)
+      const imageBox = document.getElementById('image-box');
+      imageBox.innerHTML = ''; // This clears out any old images
+
+      // Generate a random page number for the request (to ensure different images)
+      const page = Math.floor(Math.random() * 20) + 1; // Random page number between 1 and 20
+      const perPage = 1; // Request 1 image per call
+
+      // Build the full URL for the API call
+      const url = `${apiUrl}?page=${page}&per_page=${perPage}`;
+
+      // Fetch data from Pexels API
+      fetch(url, {
+        headers: {
+          'Authorization': apiKey,
+          'Cache-Control': 'no-cache' // Prevent browser caching
+        }
+      })
+      .then(response => {
+        console.log("Received response from Pexels API");
+        return response.json();
+      })
+      .then(data => {
+        if (data.photos && data.photos.length > 0) {
+          const imageUrl = data.photos[0].src.original; // Get the URL of the image
+          console.log("New image URL:", imageUrl);
+
+          // Create an img element and set its source to the random image URL
+          const img = document.createElement('img');
+          img.src = imageUrl;
+          img.alt = 'Random Image';
+          img.id = 'random-image';
+
+          // Append the new image to the image box
+          imageBox.appendChild(img);
+
+          console.log("New image displayed.");
+        } else {
+          console.error('No image found in the response.');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching image:', error);
+      });
+    }
+  </script>
+
+</body>
+</html>
